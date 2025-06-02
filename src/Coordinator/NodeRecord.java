@@ -39,6 +39,13 @@ public class NodeRecord implements Serializable {
     public void setAlive(boolean isAlive) {
         this.isAlive = isAlive;
     }
+    public void setNode(Node node) {
+        this.node = node;
+    }
+    public void setSyncPort(int syncPort) {
+        this.syncPort = syncPort;
+    }
+
 }
 
 
@@ -66,6 +73,4 @@ public class NodeRecord implements Serializable {
 //        return syncPort;
 //    }
 //
-//    public void setSyncPort(int syncPort) {
-//        this.syncPort = syncPort;
-//    }
+

@@ -12,7 +12,7 @@ import java.util.List;
 public class SyncClient {
 
     List<Operation> operations;  Path nodePath;
-    SyncClient (List<Operation> operations, Path nodePath) {
+    public SyncClient (List<Operation> operations, Path nodePath) {
         this.operations = operations;
         this.nodePath = nodePath;
     }

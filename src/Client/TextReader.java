@@ -1,12 +1,10 @@
-package Client.UI;
+package Client;
 
-import Client.ClientCallbackImpl;
 import Common.ClientCallback;
 import Common.Coordinator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 
 public class TextReader extends JFrame {
@@ -17,11 +15,14 @@ public class TextReader extends JFrame {
     private ClientCallback callback;
     private JTextArea textArea;
     private JLabel notificationLabel;
+    private String department;
 
-    public TextReader(String fileName, java.util.List<String>fileLines, Coordinator coordinator, String token) {
+    public TextReader(String fileName,String department ,java.util.List<String>fileLines, Coordinator coordinator, String token) {
         this.fileName = fileName;
         this.coordinator = coordinator;
         this.token = token;
+        textArea = new JTextArea();
+        this.department = department;
 
         setTitle("Text Reader – " + fileName);
         setSize(700, 500);
@@ -50,7 +51,10 @@ public class TextReader extends JFrame {
 
         // Refresh button
         JButton refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(e -> refreshFile());
+        refreshButton.addActionListener(e -> {
+            System.out.println("Refresh");
+            refreshFile();
+        });
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(notificationLabel, BorderLayout.CENTER);
@@ -75,7 +79,7 @@ public class TextReader extends JFrame {
 
     private void refreshFile() {
         try {
-            java.util.List<String> fileLines = coordinator.readFile(token, fileName, null); // null = use own department
+            java.util.List<String> fileLines = coordinator.readFile(token, fileName, department);
             textArea.setText(String.join("\n", fileLines));
             notificationLabel.setVisible(false);
         } catch (RemoteException e) {

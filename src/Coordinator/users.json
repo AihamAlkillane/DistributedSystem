@@ -1,6 +1,10 @@
 [
-  {"username":"Siri","password":"123", "role": "QA"},
   {"username":"lolo","password":"123", "role": "development"},
   {"username":"lele","password":"123", "role": "development"},
-  {"username":"Soso","password":"123", "role": "graphic design"}
+
+  {"username":"sisi","password":"123", "role": "graphic design"},
+  {"username":"soso","password":"123", "role": "graphic design"},
+
+  {"username":"qoqo","password":"123", "role": "QA"},
+  {"username":"qaqa","password":"123", "role": "QA"}
 ]

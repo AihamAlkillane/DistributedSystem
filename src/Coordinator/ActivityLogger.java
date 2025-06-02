@@ -6,14 +6,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static Utils.Operation.OpType.ADD;
 
 public class ActivityLogger {
-    private final Map<String, List<Operation>> nodeActivity = new HashMap<>();
-    public Map<String, String> deletedFiles = new HashMap<>(); // file key : fileName/department , NodeName
-    public Map<String, String> addedFiles = new HashMap<>(); // file key : fileName/department  , NodeName
-    public Map<String, String> updatedFiles = new HashMap<>();
+    private final Map<String, List<Operation>> nodeActivity = new ConcurrentHashMap<>();
+    public Map<String, String> deletedFiles = new ConcurrentHashMap<>(); // file key : fileName/department , NodeName
+    public Map<String, String> addedFiles = new ConcurrentHashMap<>(); // file key : fileName/department  , NodeName
+    public Map<String, String> updatedFiles = new ConcurrentHashMap<>();
 
     public void logOperation(String nodeName, Operation op) {
         if (!nodeActivity.containsKey(nodeName)) {
@@ -26,7 +27,9 @@ public class ActivityLogger {
             case DELETE:
                 deletedFiles.put(op.getFileName() + "/" + op.getDepartment(), nodeName);
             case ADD:
-                addedFiles.put( op.getFileName() + "/" + op.getDepartment(),nodeName);
+                addedFiles.put(op.getFileName() + "/" + op.getDepartment(), nodeName);
+            case UPDATE:
+                updatedFiles.put(op.getFileName() + "/" + op.getDepartment(), nodeName);
         }
     }
 
@@ -36,6 +39,9 @@ public class ActivityLogger {
 
     public void clearActivity() {
         nodeActivity.clear();
+        deletedFiles.clear();
+        addedFiles.clear();
+        updatedFiles.clear();
     }
 
     public void removeOperation(Operation.OpType type, String fileKey, String nodeName) {

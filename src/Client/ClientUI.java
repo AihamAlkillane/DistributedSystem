@@ -1,7 +1,5 @@
 package Client;
 
-import Client.UI.TextEditor;
-import Client.UI.TextReader;
 import Common.Coordinator;
 import Common.Models.User;
 
@@ -22,7 +20,6 @@ public class ClientUI extends JFrame {
     private JList<String> fileList;
 
     public ClientUI() {
-        setTitle("RMI File Client");
         setSize(400, 300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -41,6 +38,7 @@ public class ClientUI extends JFrame {
                 coordinator = (Coordinator) Naming.lookup("rmi://localhost:1099/Coordinator");
                 user = coordinator.login(usernameField.getText(), new String(passwordField.getPassword()));
                 token = user.getToken();
+                this.setTitle(user.getUsername() + " - " + user.geDepartment());
                 initMainMenu();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Login failed: " + e.getMessage());
@@ -49,6 +47,7 @@ public class ClientUI extends JFrame {
         } else {
             System.exit(0);
         }
+
     }
 
     private void initMainMenu() {
@@ -92,7 +91,6 @@ public class ClientUI extends JFrame {
         }
     }
 
-
     private void deleteFile() {
         String fileName = JOptionPane.showInputDialog(this, "Enter file name to delete:");
         if (fileName != null && !fileName.isBlank()) {
@@ -124,7 +122,7 @@ public class ClientUI extends JFrame {
 
                 if (selectedFile != null) {
                     List<String> fileData = coordinator.readFile(token, selectedFile, department);
-                    SwingUtilities.invokeLater(() -> new TextReader(selectedFile, fileData, coordinator, token));
+                    SwingUtilities.invokeLater(() -> new TextReader(selectedFile, department, fileData, coordinator, token));
                 }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Read failed: " + e.getMessage());
@@ -134,7 +132,7 @@ public class ClientUI extends JFrame {
 
     private void editFile() {
         try {
-            Set<String> files = coordinator.getFiles(token, null);
+            Set<String> files = coordinator.getFiles(token, user.geDepartment());
             if (files.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "No files found.");
                 return;
@@ -144,7 +142,7 @@ public class ClientUI extends JFrame {
                     JOptionPane.QUESTION_MESSAGE, null, files.toArray(), files.iterator().next());
 
             if (selectedFile != null) {
-                List<String> fileLines = coordinator.readFile(token, selectedFile, user.getRole());
+                List<String> fileLines = coordinator.readFile(token, selectedFile, user.geDepartment());
                 SwingUtilities.invokeLater(() ->
                         new TextEditor(selectedFile, fileLines, coordinator, token, selectedFile));
             }
@@ -152,6 +150,7 @@ public class ClientUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Edit failed: " + e.getMessage());
         }
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(ClientUI::new);

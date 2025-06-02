@@ -6,6 +6,7 @@ import Node.Sync.SyncClient;
 import Utils.Operation;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,7 +24,7 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
     private int syncPort;
 
     @Override
-    public String getNodeName() {
+    public String getNodeName() throws RemoteException {
         return nodeName;
     }
 
@@ -35,6 +36,7 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
     public void setSyncPort(int syncPort) {
         this.syncPort = syncPort;
     }
+
     public NodeImpl(String nodeName, Path nodePath, int syncPort) throws RemoteException {
         super();
         this.nodeName = nodeName;
@@ -75,7 +77,7 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 
     @Override
     public Status updateFile(String department, String fileName, Map<Integer, String> updatedLines) throws RemoteException {
-        Path filePath = nodePath.resolve(Paths.get(department, fileName));
+        Path filePath = Paths.get(nodePath.toString(),department, fileName);
 
         if (!Files.exists(filePath)) {
             return Status.not_found;
@@ -118,16 +120,15 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 
     @Override
     public List<String> readFile(String fileName, String department) throws RemoteException {
-        Path filePath = nodePath.resolve(Paths.get(department, fileName));
+        Path filePath = Paths.get(nodePath.toString(),department, fileName);
 
         if (!Files.exists(filePath)) {
             throw new RemoteException("File not found");
         }
         try {
-            return Files.readAllLines(filePath);
-
-        }
-        catch (IOException e) {
+            List lines = Files.readAllLines(filePath);
+            return lines;
+        } catch (IOException e) {
             throw new RuntimeException("Failed to read file: " + fileName, e);
         }
     }
@@ -159,9 +160,9 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 //    }
 
     @Override
-    public void triggerSync(List<Operation> operations,int targetPort) throws RemoteException {
+    public void triggerSync(List<Operation> operations, int targetPort) throws RemoteException {
         new Thread(() -> {
-            SyncClient client = new SyncClient(operations,nodePath); // customize this constructor
+            SyncClient client = new SyncClient(operations, nodePath); // customize this constructor
             client.sync(targetPort);
         }).start();
     }

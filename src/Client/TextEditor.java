@@ -1,12 +1,10 @@
-package Client.UI;
+package Client;
 
 import Common.Coordinator;
 
 import javax.swing.*;
-import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.List;
@@ -23,7 +21,7 @@ public class TextEditor extends JFrame {
         this.coordinator = coordinator;
         this.token = token;
         this.fileName = fileName;
-
+        this.textArea = new JTextArea();
         setTitle("Text Editor – " + title);
         setSize(700, 500);
         setLocationRelativeTo(null);

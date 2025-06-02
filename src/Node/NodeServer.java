@@ -14,7 +14,6 @@ public class NodeServer {
             String nodeName = args.length > 0 ? args[0] : "Node1";
             int rmiPort = args.length > 1 ? Integer.parseInt(args[1]) : 1100;
             int syncPort = args.length > 2 ? Integer.parseInt(args[2]) : 9001;
-            //int NodeID = args.length > 3 ? Integer.parseInt(args[3]) : 0;
 
             Path nodePath = Paths.get("files", nodeName);
             try {

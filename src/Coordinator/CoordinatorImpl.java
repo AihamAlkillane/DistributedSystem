@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Logger;
 
 public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator {
 
@@ -21,7 +22,7 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
     private final Map<String, Set<ClientCallback>> fileListeners = new HashMap<>();
     private final Map<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
-    private final ActivityLogger logger;
+    public ActivityLogger logger;
     private final Auth auth;
     private int attempts = 0;
 
@@ -46,6 +47,20 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
 
     @Override
     public void registerNode(Node node) throws RemoteException {
+
+        for (NodeRecord record : connectedNodes) {
+
+            String recordNodeName = record.getNodeName();
+            String nodeName = node.getNodeName();
+            if (recordNodeName.equals(nodeName)) {
+                record.setNode(node);
+                record.setAlive(true);
+                System.out.println("Node Rejoined: " + node.getNodeName());
+                return;
+            }
+        }
+
+
         String name = node.getNodeName();
         int syncPort = node.getSyncPort();
         NodeRecord record = new NodeRecord(name, node, syncPort);
@@ -69,35 +84,35 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
 
         String department = auth.getDepartment(token);
         String fileKey = fileName + "/" + department;
-        if (logger.addedFiles.containsKey(fileKey))
-            throw new RemoteException("File already exists");
 
-        if (logger.deletedFiles.containsKey(fileKey)) {
-            String nodeName = logger.deletedFiles.get(fileKey);
-            logger.removeOperation(Operation.OpType.ADD, fileKey, nodeName);
-        }
-
-        Lock lock = locks.computeIfAbsent(department, k -> new ReentrantLock());
+        Lock lock = locks.computeIfAbsent(fileKey, k -> new ReentrantLock());
         lock.lock();
         try {
-            int attempts = connectedNodes.size();
-            while (attempts > 0) {
-                NodeRecord nodeRecord = getNextAvailableNodeRecord();
-                Node node = nodeRecord.getNode();
+            if (logger.addedFiles.containsKey(fileKey))
+                throw new RemoteException("File already exists");
 
-                if (node.addFile(department, fileName, lines) == Status.success) {
-                    Operation op = new Operation(Operation.OpType.ADD, department, fileName, null);
-                    logger.logOperation(nodeRecord.getNodeName(), op);
-                    return true;
-                } else if (node.addFile(department, fileName, lines) == Status.already_exists) {
-                    throw new RemoteException("File already exists");
-                }
-                attempts--;
+            if (logger.deletedFiles.containsKey(fileKey)) {
+                logger.deletedFiles.remove(fileKey);
             }
+            for (NodeRecord record : connectedNodes) {
+                if (!record.isAlive()) continue;
+                try {
+                    Status status = record.getNode().addFile(department, fileName, lines);
+                    if (status == Status.success) {
+                        Operation op = new Operation(Operation.OpType.ADD, department, fileName, null);
+                        logger.logOperation(record.getNodeName(), op);
+                        logger.deletedFiles.remove(fileKey);
+                        return true;
+                    } else if (status == Status.already_exists)
+                        throw new RemoteException("File already exists");
+                } catch (RemoteException e) {
+                    record.setAlive(false);
+                }
+            }
+
         } finally {
             lock.unlock();
         }
-
         throw new RemoteException("failed to add file :: all nodes have failed");
     }
 
@@ -107,37 +122,37 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
             throw new RemoteException("Not authorized");
 
         String department = auth.getDepartment(token);
+        String fileKey = fileName + "/" + department;
 
-        if (logger.deletedFiles.containsKey(fileName + "/" + department))
-            throw new RemoteException("File not found");
+        Lock lock = locks.computeIfAbsent(fileKey, k -> new ReentrantLock());
+        lock.lock();
+        try {
+            if (logger.deletedFiles.containsKey(fileKey))
+                throw new RemoteException("File not found");
 
-        if (logger.addedFiles.containsKey(fileName + "/" + department)) {
-            String nodeName = logger.addedFiles.get(fileName + "/" + department);
-            logger.removeOperation(Operation.OpType.DELETE, fileName + "/" + department, nodeName);
-        }
-        int notFoundCount = 0;
-        int attempts = connectedNodes.size();
+            int notFoundCount = 0;
+            for (NodeRecord record : connectedNodes) {
+                if (!record.isAlive()) continue;
+                try {
+                    Status status = record.getNode().deleteFile(department, fileName);
+                    if (status == Status.success) {
+                        Operation op = new Operation(Operation.OpType.DELETE, department, fileName, null);
+                        logger.logOperation(record.getNodeName(), op);
+                        logger.updatedFiles.remove(fileKey);
+                        logger.deletedFiles.remove(fileKey);
+                        return true;
 
-        while (attempts > 0) {
-            attempts--;
-
-            NodeRecord nodeRecord = getNextAvailableNodeRecord();
-            Node node = nodeRecord.getNode();
-            Status status = node.deleteFile(department, fileName);
-
-            switch (status) {
-                case success:
-                    Operation op = new Operation(Operation.OpType.DELETE, department, fileName, null);
-                    logger.logOperation(nodeRecord.getNodeName(), op);
-                    return true;
-                case failed:
-                    continue;
-                case not_found:
-                    notFoundCount++;
+                    } else if (status == Status.not_found)
+                        notFoundCount++;
+                } catch (RemoteException e) {
+                    record.setAlive(false);
+                }
             }
+            if (notFoundCount == connectedNodes.size())
+                throw new RemoteException("file not found");
+        } finally {
+            lock.unlock();
         }
-        if (notFoundCount == connectedNodes.size())
-            throw new RemoteException("file not found");
 
         throw new RemoteException("failed to delete file :: all nodes have failed");
     }
@@ -145,68 +160,82 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
     @Override
     public boolean updateFile(String token, String fileName, Map<Integer, String> updatedLines) throws RemoteException {
         if (!auth.authenticate(token))
-            return false;
+            throw new RemoteException("invalid credentials");
 
         String department = auth.getDepartment(token);
         String fileKey = fileName + "/" + department;
 
-        if (logger.deletedFiles.containsKey(fileKey))
-            throw new RemoteException("File not found");
+        Lock lock = locks.computeIfAbsent(fileKey, k -> new ReentrantLock());
+        lock.lock();
+        try {
+            if (logger.deletedFiles.containsKey(fileKey))
+                throw new RemoteException("File not found");
 
-        NodeRecord nodeRecord = null;
+            NodeRecord nodeRecord = null;
+            String nodeName = null;
 
-        if (logger.updatedFiles.containsKey(fileKey)) {
-            String nodeName = logger.updatedFiles.get(fileKey);
-            for (NodeRecord temp : connectedNodes) {
-                if (temp.getNode().getNodeName().equals(nodeName)) {
-                    nodeRecord = temp;
-                    break;
+            if (logger.addedFiles.containsKey(fileKey)) {
+                nodeName = logger.updatedFiles.get(fileKey);
+                for (NodeRecord temp : connectedNodes) {
+                    if (temp.getNode().getNodeName().equals(nodeName)) {
+                        nodeRecord = temp;
+                        break;
+                    }
+                }
+                logger.addedFiles.remove(fileKey);
+            } else if (logger.updatedFiles.containsKey(fileKey)) {
+                nodeName = logger.updatedFiles.get(fileKey);
+                for (NodeRecord temp : connectedNodes) {
+                    if (temp.getNode().getNodeName().equals(nodeName)) {
+                        nodeRecord = temp;
+                        break;
+                    }
                 }
             }
+            if (nodeName != null) {
+                try {
+                    for (NodeRecord temp : connectedNodes) {
+                        if (temp.getNodeName().equals(nodeName)) {
+                            nodeRecord = temp;
+                            break;
+                        }
+                    }
+                    Status status = nodeRecord.getNode().updateFile(department, fileName, updatedLines);
+                    if (status == Status.success) {
+                        notifyListeners(fileName);
+                        Operation op = new Operation(Operation.OpType.UPDATE, department, fileName, updatedLines);
+                        logger.logOperation(nodeRecord.getNodeName(), op);
+                        return true;
+                    }
 
-            Node node = nodeRecord.getNode();
-            Status status = node.updateFile(department, fileName, updatedLines);
-            if (status == Status.success) {
-                Operation op = new Operation(Operation.OpType.UPDATE, department, fileName, updatedLines);
-                logger.logOperation(nodeRecord.getNodeName(), op);
-                notifyListeners(fileName);
-                return true;
+                } catch (RemoteException e) {
+                    nodeRecord.setAlive(false);
+                }
             }
-            throw new RemoteException("file is currently unavailable");
+            for (NodeRecord record : connectedNodes) {
+                try {
+                    Status status = record.getNode().updateFile(department, fileName, updatedLines);
+                    if (status == Status.success) {
+                        notifyListeners(fileName);
+                        Operation op = new Operation(Operation.OpType.UPDATE, department, fileName, updatedLines);
+                        logger.logOperation(record.getNodeName(), op);
+                        return true;
+                    }
+
+                } catch (RemoteException e) {
+                    record.setAlive(false);
+                }
+            }
+        } finally {
+            lock.unlock();
         }
-        int attempts = connectedNodes.size();
-        while (attempts-- > 0) {
-            nodeRecord = getNextAvailableNodeRecord();
-            Node node = nodeRecord.getNode();
-            Status status;
-
-            Lock lock = locks.computeIfAbsent(fileKey, k -> new ReentrantLock());
-            lock.lock();
-            try {
-                status = node.updateFile(department, fileName, updatedLines);
-            } finally {
-                lock.unlock();
-            }
-
-            if (status == Status.success) {
-                Operation op = new Operation(Operation.OpType.UPDATE, department, fileName, updatedLines);
-                logger.logOperation(nodeRecord.getNodeName(), op);
-                logger.updatedFiles.put(fileKey, nodeRecord.getNodeName());
-                notifyListeners(fileName);
-                return true;
-            }
-        }
-        throw new RemoteException("Failed to update file :: all nodes have failed");
+        throw new RemoteException("all nodes have failed");
     }
 
     @Override
     public Set<String> getFiles(String token, String department) throws RemoteException {
         if (!auth.authenticate(token))
             throw new RemoteException("Not authorized");
-
-        if (department == null) {
-            department = auth.getDepartment(token);
-        }
 
         Set<String> fileNames = new HashSet<>();
         for (NodeRecord record : connectedNodes) {
@@ -216,6 +245,11 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
             } catch (Exception e) {
                 System.err.println("Failed to fetch files from node: " + e.getMessage());
             }
+        }
+
+        for (String fileName : fileNames) {
+            if (logger.deletedFiles.containsKey(fileName))
+                fileNames.remove(fileName);
         }
         return fileNames;
     }
@@ -237,8 +271,15 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
                 }
             }
         }
-        getNextAvailableNodeRecord().getNode().readFile(fileName, department);
-
+        int attempts = connectedNodes.size();
+        while (attempts-- > 0) {
+            try {
+                NodeRecord record = getNextAvailableNodeRecord();
+                return record.getNode().readFile(fileName, department);
+            } catch (Exception e) {
+                System.err.println("Failed to fetch files from node: " + e.getMessage());
+            }
+        }
         throw new RemoteException("Failed to read file :: all nodes have failed");
 
     }
@@ -277,11 +318,13 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
         }
     }
 
-    public List<NodeRecord> getConnectedNodes() throws RemoteException {
+    @Override
+    public List<NodeRecord> getConnectedNodes()throws RemoteException{
         return connectedNodes;
     }
 
-    public ActivityLogger getActivityLogger() throws RemoteException {
-        return logger;
+    @Override
+    public ActivityLogger getActivityLogger() throws RemoteException{
+        return this.logger;
     }
 }

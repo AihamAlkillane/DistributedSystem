@@ -46,6 +46,6 @@ public class Auth {
         return onlineUsers.containsKey(token);
     }
     public String getDepartment(String token){
-     return onlineUsers.get(token).getRole();
+     return onlineUsers.get(token).geDepartment();
     }
 }

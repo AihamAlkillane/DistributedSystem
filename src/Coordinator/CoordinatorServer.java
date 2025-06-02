@@ -21,7 +21,7 @@ public class CoordinatorServer {
             } catch (Exception e) {
                 System.out.println("Registry already exists.");
             }
-            Coordinator coordinator = new CoordinatorImpl();
+            CoordinatorImpl coordinator = new CoordinatorImpl();
             Naming.rebind("rmi://localhost:1099/Coordinator", coordinator);
             System.out.println("Coordinator ready on port 1099");
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -40,7 +40,7 @@ public class CoordinatorServer {
 
     }
 
-    private static void syncFiles(List<NodeRecord> connectedNodes, Coordinator coordinator) {
+    private static void syncFiles(List<NodeRecord> connectedNodes, CoordinatorImpl coordinator) {
         for (NodeRecord sourceNode : connectedNodes) {
             List<Operation> operations;
             try {
@@ -65,6 +65,4 @@ public class CoordinatorServer {
             }
         }
     }
-
-
 }
