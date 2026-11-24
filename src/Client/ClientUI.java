@@ -137,7 +137,7 @@ public class ClientUI extends JFrame {
                 JOptionPane.showMessageDialog(this, "No files found.");
                 return;
             }
-
+            System.out.println(files.toString());
             String selectedFile = (String) JOptionPane.showInputDialog(this, "Choose file to edit:", "Edit File",
                     JOptionPane.QUESTION_MESSAGE, null, files.toArray(), files.iterator().next());
 
@@ -148,9 +148,9 @@ public class ClientUI extends JFrame {
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Edit failed: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(ClientUI::new);

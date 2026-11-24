@@ -12,9 +12,9 @@ import static Utils.Operation.OpType.ADD;
 
 public class ActivityLogger {
     private final Map<String, List<Operation>> nodeActivity = new ConcurrentHashMap<>();
-    public Map<String, String> deletedFiles = new ConcurrentHashMap<>(); // file key : fileName/department , NodeName
-    public Map<String, String> addedFiles = new ConcurrentHashMap<>(); // file key : fileName/department  , NodeName
-    public Map<String, String> updatedFiles = new ConcurrentHashMap<>();
+    public Map<String, String> deletedFiles = new HashMap<>(); // file key : fileName/department , NodeName
+    public Map<String, String> addedFiles = new HashMap<>(); // file key : fileName/department  , NodeName
+    public Map<String, String> updatedFiles = new HashMap<>();
 
     public void logOperation(String nodeName, Operation op) {
         if (!nodeActivity.containsKey(nodeName)) {

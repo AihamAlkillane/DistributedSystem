@@ -1,10 +1,11 @@
 package Utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Operation {
+public class Operation implements Serializable {
     public enum OpType {UPDATE, DELETE, ADD}
 
     private final OpType type;

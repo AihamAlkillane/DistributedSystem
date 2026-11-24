@@ -1,0 +1,119 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Projects\\DistributedFileSys\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\DistributedFileSys\\src\\Common\\Coordinator.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Common\\Coordinator.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\DistributedFileSys\\src\\Coordinator\\ActivityLogger.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Coordinator\\ActivityLogger.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\DistributedFileSys\\src\\Common\\Node.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Common\\Node.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\DistributedFileSys\\src\\Coordinator\\CoordinatorImpl.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Coordinator\\CoordinatorImpl.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Projects\\DistributedFileSys\\src\\Common\\Status.java||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\Common\\Status.java||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Node.java",
+              "DocumentMoniker": "D:\\Projects\\DistributedFileSys\\src\\Common\\Node.java",
+              "RelativeDocumentMoniker": "src\\Common\\Node.java",
+              "ToolTip": "D:\\Projects\\DistributedFileSys\\src\\Common\\Node.java",
+              "RelativeToolTip": "src\\Common\\Node.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-07-18T08:23:15.925Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Coordinator.java",
+              "DocumentMoniker": "D:\\Projects\\DistributedFileSys\\src\\Common\\Coordinator.java",
+              "RelativeDocumentMoniker": "src\\Common\\Coordinator.java",
+              "ToolTip": "D:\\Projects\\DistributedFileSys\\src\\Common\\Coordinator.java",
+              "RelativeToolTip": "src\\Common\\Coordinator.java",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-07-18T08:21:30.878Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CoordinatorImpl.java",
+              "DocumentMoniker": "D:\\Projects\\DistributedFileSys\\src\\Coordinator\\CoordinatorImpl.java",
+              "RelativeDocumentMoniker": "src\\Coordinator\\CoordinatorImpl.java",
+              "ToolTip": "D:\\Projects\\DistributedFileSys\\src\\Coordinator\\CoordinatorImpl.java",
+              "RelativeToolTip": "src\\Coordinator\\CoordinatorImpl.java",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-07-18T08:20:56.806Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ActivityLogger.java",
+              "DocumentMoniker": "D:\\Projects\\DistributedFileSys\\src\\Coordinator\\ActivityLogger.java",
+              "RelativeDocumentMoniker": "src\\Coordinator\\ActivityLogger.java",
+              "ToolTip": "D:\\Projects\\DistributedFileSys\\src\\Coordinator\\ActivityLogger.java",
+              "RelativeToolTip": "src\\Coordinator\\ActivityLogger.java",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-07-18T08:20:37.768Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Status.java",
+              "DocumentMoniker": "D:\\Projects\\DistributedFileSys\\src\\Common\\Status.java",
+              "RelativeDocumentMoniker": "src\\Common\\Status.java",
+              "ToolTip": "D:\\Projects\\DistributedFileSys\\src\\Common\\Status.java",
+              "RelativeToolTip": "src\\Common\\Status.java",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-07-18T08:19:05.958Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -139,7 +139,7 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
                         Operation op = new Operation(Operation.OpType.DELETE, department, fileName, null);
                         logger.logOperation(record.getNodeName(), op);
                         logger.updatedFiles.remove(fileKey);
-                        logger.deletedFiles.remove(fileKey);
+                        logger.addedFiles.remove(fileKey);
                         return true;
 
                     } else if (status == Status.not_found)
@@ -244,13 +244,14 @@ public class CoordinatorImpl extends UnicastRemoteObject implements Coordinator 
                 fileNames.addAll(record.getNode().getFiles(department));
             } catch (Exception e) {
                 System.err.println("Failed to fetch files from node: " + e.getMessage());
+                record.setAlive(false);
             }
         }
-
         for (String fileName : fileNames) {
-            if (logger.deletedFiles.containsKey(fileName))
+            if (logger.deletedFiles.containsKey(fileName + "/" + department))
                 fileNames.remove(fileName);
         }
+
         return fileNames;
     }
 

@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\files",
+    "\\files\\Node1",
+    "\\Lib",
+    "\\src",
+    "\\src\\Client",
+    "\\src\\Common",
+    "\\src\\Coordinator",
+    "\\src\\Node",
+    "\\src\\Utils"
+  ],
+  "SelectedNode": "\\src\\Utils\\Operation.java",
+  "PreviewInSolutionExplorer": false
+}

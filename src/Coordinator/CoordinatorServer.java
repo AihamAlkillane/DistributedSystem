@@ -26,14 +26,9 @@ public class CoordinatorServer {
             System.out.println("Coordinator ready on port 1099");
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(() -> {
-                try {
-                    syncFiles(coordinator.getConnectedNodes(), coordinator);
-                } catch (RemoteException e) {
-                    e.printStackTrace(); // or log it
-                }
+                syncFiles(coordinator.connectedNodes, coordinator);
+
             }, 0, 2, TimeUnit.MINUTES);
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,13 +38,7 @@ public class CoordinatorServer {
     private static void syncFiles(List<NodeRecord> connectedNodes, CoordinatorImpl coordinator) {
         for (NodeRecord sourceNode : connectedNodes) {
             List<Operation> operations;
-            try {
-                operations = coordinator.getActivityLogger().getActivity(sourceNode.getNodeName());
-            } catch (RemoteException e) {
-                System.err.println("Failed to fetch operations for node: " + sourceNode.getNodeName());
-                e.printStackTrace();
-                continue;
-            }
+            operations = coordinator.logger.getActivity(sourceNode.getNodeName());
 
             for (NodeRecord targetNode : connectedNodes) {
                 if (!sourceNode.equals(targetNode)) {
@@ -64,5 +53,6 @@ public class CoordinatorServer {
                 }
             }
         }
+        coordinator.logger.clearActivity();
     }
 }
